@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kantin Akuntansi - Sistem Manajemen</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .sellers-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .seller-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .seller-input label {
+            font-weight: 600;
+            color: #4facfe;
+        }
+
+        .seller-input input {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e6ed;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .seller-input input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(86, 171, 47, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 65, 108, 0.4);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .menu-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4facfe;
+        }
+
+        .delete-btn {
+            background: #ff416c;
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #ff4b2b;
+            transform: scale(1.1);
+        }
+
+        .menu-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #a0a6b0;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #e0e6ed;
+        }
+
+        .stock-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stock-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e6ed;
+        }
+
+        .stock-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .sales-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background: #4facfe;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #00f2fe;
+            transform: scale(1.1);
+        }
+
+        .quantity-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4facfe;
+            font-size: 1.8rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #a0a6b0;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .profit {
+            color: #56ab2f !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal h3 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0a6b0;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e6ed;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        .close:hover {
+            color: #4facfe;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .sellers-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 KANTIN AKUNTANSI</h1>
+            <p>Sistem Manajemen Kantin Sekolah</p>
+        </div>
+
+        <div class="sellers-section">
+            <div class="seller-input">
+                <label for="seller1">👤 Nama Penjual 1:</label>
+                <input type="text" id="seller1" placeholder="Masukkan nama penjual pertama">
+            </div>
+            <div class="seller-input">
+                <label for="seller2">👤 Nama Penjual 2:</label>
+                <input type="text" id="seller2" placeholder="Masukkan nama penjual kedua">
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="openAddMenuModal()">
+                ➕ Tambah Menu Baru
+            </button>
+            <button class="btn btn-success" onclick="exportToExcel()">
+                📊 Ekspor ke Excel
+            </button>
+            <button class="btn btn-danger" onclick="resetAllData()">
+                🔄 Reset Semua Data
+            </button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid">
+            <!-- Menu items akan ditampilkan di sini -->
+        </div>
+
+        <div class="summary">
+            <h2>📈 Ringkasan Keuangan</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Total Penjualan</div>
+                    <div class="summary-value" id="totalPenjualan">Rp 0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total HPP Terjual</div>
+                    <div class="summary-value" id="totalHPP">Rp 0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Keuntungan Bersih</div>
+                    <div class="summary-value profit" id="totalProfit">Rp 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Menu -->
+    <div id="addMenuModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddMenuModal()">&times;</span>
+            <h3>➕ Tambah Menu Baru</h3>
+            <div class="form-group">
+                <label for="menuName">Nama Menu:</label>
+                <input type="text" id="menuName" placeholder="Contoh: Bakso Spesial">
+            </div>
+            <div class="form-group">
+                <label for="menuHPP">HPP (Harga Pokok Penjualan):</label>
+                <input type="number" id="menuHPP" placeholder="Contoh: 3000">
+            </div>
+            <div class="form-group">
+                <label for="menuPrice">Harga Jual:</label>
+                <input type="number" id="menuPrice" placeholder="Contoh: 4000">
+            </div>
+            <div class="form-group">
+                <label for="initialStock">Persediaan Awal:</label>
+                <input type="number" id="initialStock" placeholder="Contoh: 50" value="0">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="addNewMenu()">Tambah Menu</button>
+                <button class="btn btn-danger" onclick="closeAddMenuModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data menu default
+        let menuData = [
+            { id: 1, name: "SIOMAY", hpp: 4500, price: 5000, initialStock: 0, sold: 0 },
+            { id: 2, name: "DIMSUM", hpp: 2000, price: 2500, initialStock: 0, sold: 0 },
+            { id: 3, name: "RISOL MAYONES", hpp: 2000, price: 2500, initialStock: 0, sold: 0 },
+            { id: 4, name: "PANGSIT CHILI OIL", hpp: 4500, price: 5000, initialStock: 0, sold: 0 },
+            { id: 5, name: "NASI KEPAL", hpp: 4500, price: 5000, initialStock: 0, sold: 0 },
+            { id: 6, name: "RISOL AYAM", hpp: 2000, price: 5000, initialStock: 0, sold: 0 },
+            { id: 7, name: "RISOL MARGO", hpp: 2000, price: 2500, initialStock: 0, sold: 0 },
+            { id: 8, name: "BASO MERCON", hpp: 4500, price: 5000, initialStock: 0, sold: 0 }
+        ];
+
+        let nextId = 9;
+        let saleQuantities = {};
+
+        // Inisialisasi aplikasi
+        function init() {
+            loadData();
+            renderMenus();
+            updateSummary();
+        }
+
+        // Simpan data ke localStorage
+        function saveData() {
+            localStorage.setItem('kantinData', JSON.stringify({
+                menuData: menuData,
+                nextId: nextId,
+                seller1: document.getElementById('seller1').value,
+                seller2: document.getElementById('seller2').value
+            }));
+        }
+
+        // Muat data dari localStorage
+        function loadData() {
+            const saved = localStorage.getItem('kantinData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                menuData = data.menuData || menuData;
+                nextId = data.nextId || nextId;
+                document.getElementById('seller1').value = data.seller1 || '';
+                document.getElementById('seller2').value = data.seller2 || '';
+            }
+            
+            // Inisialisasi saleQuantities
+            menuData.forEach(menu => {
+                saleQuantities[menu.id] = 0;
+            });
+        }
+
+        // Format mata uang Rupiah
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Render semua menu
+        function renderMenus() {
+            const menuGrid = document.getElementById('menuGrid');
+            menuGrid.innerHTML = '';
+
+            menuData.forEach(menu => {
+                const currentStock = menu.initialStock - menu.sold;
+                const profit = menu.price - menu.hpp;
+                
+                const menuCard = document.createElement('div');
+                menuCard.className = 'menu-card';
+                menuCard.innerHTML = `
+                    <div class="menu-header">
+                        <div class="menu-name">${menu.name}</div>
+                        <button class="delete-btn" onclick="deleteMenu(${menu.id})" title="Hapus Menu">×</button>
+                    </div>
+                    
+                    <div class="menu-info">
+                        <div class="info-item">
+                            <span class="info-label">HPP:</span>
+                            <span class="info-value">${formatRupiah(menu.hpp)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Harga Jual:</span>
+                            <span class="info-value">${formatRupiah(menu.price)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Keuntungan:</span>
+                            <span class="info-value profit">${formatRupiah(profit)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Stok Saat Ini:</span>
+                            <span class="info-value">${currentStock}</span>
+                        </div>
+                    </div>
+
+                    <div class="stock-controls">
+                        <input type="number" class="stock-input" id="stock-${menu.id}" 
+                               placeholder="Tambah stok" min="0">
+                        <button class="btn btn-primary btn-small" onclick="addStock(${menu.id})">
+                            ➕ Tambah Stok
+                        </button>
+                    </div>
+
+                    <div class="sales-controls">
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="changeQuantity(${menu.id}, -1)">-</button>
+                            <span class="quantity-display" id="qty-${menu.id}">${saleQuantities[menu.id] || 0}</span>
+                            <button class="quantity-btn" onclick="changeQuantity(${menu.id}, 1)">+</button>
+                        </div>
+                        <button class="btn btn-success btn-small" onclick="processSale(${menu.id})" 
+                                ${currentStock === 0 ? 'disabled' : ''}>
+                            💰 Jual
+                        </button>
+                    </div>
+
+                    <div class="menu-info" style="margin-top: 15px;">
+                        <div class="info-item">
+                            <span class="info-label">Total Terjual:</span>
+                            <span class="info-value">${menu.sold}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total HPP:</span>
+                            <span class="info-value">${formatRupiah(menu.hpp * menu.sold)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Penjualan:</span>
+                            <span class="info-value profit">${formatRupiah(menu.price * menu.sold)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Keuntungan:</span>
+                            <span class="info-value profit">${formatRupiah((menu.price - menu.hpp) * menu.sold)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                menuGrid.appendChild(menuCard);
+            });
+        }
+
+        // Ubah kuantitas penjualan
+        function changeQuantity(menuId, change) {
+            const menu = menuData.find(m => m.id === menuId);
+            const currentStock = menu.initialStock - menu.sold;
+            
+            saleQuantities[menuId] = (saleQuantities[menuId] || 0) + change;
+            
+            if (saleQuantities[menuId] < 0) saleQuantities[menuId] = 0;
+            if (saleQuantities[menuId] > currentStock) saleQuantities[menuId] = currentStock;
+            
+            document.getElementById(`qty-${menuId}`).textContent = saleQuantities[menuId];
+        }
+
+        // Tambah stok
+        function addStock(menuId) {
+            const stockInput = document.getElementById(`stock-${menuId}`);
+            const additionalStock = parseInt(stockInput.value) || 0;
+            
+            if (additionalStock > 0) {
+                const menu = menuData.find(m => m.id === menuId);
+                menu.initialStock += additionalStock;
+                stockInput.value = '';
+                
+                saveData();
+                renderMenus();
+                updateSummary();
+            }
+        }
+
+        // Proses penjualan
+        function processSale(menuId) {
+            const quantity = saleQuantities[menuId] || 0;
+            if (quantity === 0) return;
+            
+            const menu = menuData.find(m => m.id === menuId);
+            const currentStock = menu.initialStock - menu.sold;
+            
+            if (quantity <= currentStock) {
+                menu.sold += quantity;
+                saleQuantities[menuId] = 0;
+                
+                saveData();
+                renderMenus();
+                updateSummary();
+            }
+        }
+
+        // Update ringkasan keuangan
+        function updateSummary() {
+            let totalPenjualan = 0;
+            let totalHPP = 0;
+
+            menuData.forEach(menu => {
+                totalPenjualan += menu.price * menu.sold;
+                totalHPP += menu.hpp * menu.sold;
+            });
+
+            const totalProfit = totalPenjualan - totalHPP;
+
+            document.getElementById('totalPenjualan').textContent = formatRupiah(totalPenjualan);
+            document.getElementById('totalHPP').textContent = formatRupiah(totalHPP);
+            document.getElementById('totalProfit').textContent = formatRupiah(totalProfit);
+        }
+
+        // Modal functions
+        function openAddMenuModal() {
+            document.getElementById('addMenuModal').style.display = 'block';
+        }
+
+        function closeAddMenuModal() {
+            document.getElementById('addMenuModal').style.display = 'none';
+            document.getElementById('menuName').value = '';
+            document.getElementById('menuHPP').value = '';
+            document.getElementById('menuPrice').value = '';
+            document.getElementById('initialStock').value = '0';
+        }
+
+        // Tambah menu baru
+        function addNewMenu() {
+            const name = document.getElementById('menuName').value.trim();
+            const hpp = parseInt(document.getElementById('menuHPP').value) || 0;
+            const price = parseInt(document.getElementById('menuPrice').value) || 0;
+            const initialStock = parseInt(document.getElementById('initialStock').value) || 0;
+
+            if (name && hpp > 0 && price > 0) {
+                const newMenu = {
+                    id: nextId++,
+                    name: name.toUpperCase(),
+                    hpp: hpp,
+                    price: price,
+                    initialStock: initialStock,
+                    sold: 0
+                };
+
+                menuData.push(newMenu);
+                saleQuantities[newMenu.id] = 0;
+
+                saveData();
+                renderMenus();
+                updateSummary();
+                closeAddMenuModal();
+            } else {
+                alert('Mohon lengkapi semua field dengan benar!');
+            }
+        }
+
+        // Hapus menu
+        function deleteMenu(menuId) {
+            if (confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
+                menuData = menuData.filter(menu => menu.id !== menuId);
+                delete saleQuantities[menuId];
+                
+                saveData();
+                renderMenus();
+                updateSummary();
+            }
+        }
+
+        // Reset semua data
+        function resetAllData() {
+            if (confirm('Apakah Anda yakin ingin mereset semua data? Tindakan ini tidak dapat dibatalkan!')) {
+                menuData.forEach(menu => {
+                    menu.initialStock = 0;
+                    menu.sold = 0;
+                });
+                
+                Object.keys(saleQuantities).forEach(key => {
+                    saleQuantities[key] = 0;
+                });
+
+                document.getElementById('seller1').value = '';
+                document.getElementById('seller2').value = '';
+                
+                saveData();
+                renderMenus();
+                updateSummary();
+            }
+        }
+
+        // Ekspor ke Excel
+        function exportToExcel() {
+            const seller1 = document.getElementById('seller1').value || 'Penjual 1';
+            const seller2 = document.getElementById('seller2').value || 'Penjual 2';
+            
+            // Data untuk sheet Menu
+            const menuSheet = menuData.map(menu => ({
+                'Nama Menu': menu.name,
+                'HPP': menu.hpp,
+                'Harga Jual': menu.price,
+                'Keuntungan per Item': menu.price - menu.hpp,
+                'Persediaan Awal': menu.initialStock,
+                'Terjual': menu.sold,
+                'Sisa Stok': menu.initialStock - menu.sold,
+                'Total HPP': menu.hpp * menu.sold,
+                'Total Penjualan': menu.price * menu.sold,
+                'Total Keuntungan': (menu.price - menu.hpp) * menu.sold
+            }));
+
+            // Data ringkasan
+            let totalPenjualan = 0;
+            let totalHPP = 0;
+
+            menuData.forEach(menu => {
+                totalPenjualan += menu.price * menu.sold;
+                totalHPP += menu.hpp * menu.sold;
+            });
+
+            const summarySheet = [
+                { 'Keterangan': 'Penjual 1', 'Nilai': seller1 },
+                { 'Keterangan': 'Penjual 2', 'Nilai': seller2 },
+                { 'Keterangan': '', 'Nilai': '' },
+                { 'Keterangan': 'Total Penjualan', 'Nilai': totalPenjualan },
+                { 'Keterangan': 'Total HPP Terjual', 'Nilai': totalHPP },
+                { 'Keterangan': 'Keuntungan Bersih', 'Nilai': totalPenjualan - totalHPP }
+            ];
+
+            // Buat workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Tambah sheet Menu
+            const wsMenu = XLSX.utils.json_to_sheet(menuSheet);
+            XLSX.utils.book_append_sheet(wb, wsMenu, "Data Menu");
+            
+            // Tambah sheet Ringkasan
+            const wsSummary = XLSX.utils.json_to_sheet(summarySheet);
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Ringkasan");
+
+            // Download file
+            const today = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `Kantin_Akuntansi_${today}.xlsx`);
+        }
+
+        // Event listeners
+        document.getElementById('seller1').addEventListener('input', saveData);
+        document.getElementById('seller2').addEventListener('input', saveData);
+
+        // Tutup modal saat klik di luar
+        window.onclick = function(event) {
+            const modal = document.getElementById('addMenuModal');
+            if (event.target === modal) {
+                closeAddMenuModal();
+            }
+        }
+
+        // Inisialisasi aplikasi saat halaman dimuat
+        init();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979ca32007c1fd8d',t:'MTc1Njk3OTk5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
