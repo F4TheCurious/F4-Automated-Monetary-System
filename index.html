@@ -268,6 +268,25 @@
             color: #4facfe;
         }
 
+        .quantity-input {
+            width: 60px;
+            padding: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #4facfe;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+        }
+
         .summary {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
@@ -463,7 +482,7 @@
                     <div class="summary-value" id="totalHPP">Rp 0</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-label">Keuntungan Bersih</div>
+                    <div class="summary-label">Laba/Keuntungan</div>
                     <div class="summary-value profit" id="totalProfit">Rp 0</div>
                 </div>
             </div>
@@ -604,7 +623,10 @@
                     <div class="sales-controls">
                         <div class="quantity-control">
                             <button class="quantity-btn" onclick="changeQuantity(${menu.id}, -1)">-</button>
-                            <span class="quantity-display" id="qty-${menu.id}">${saleQuantities[menu.id] || 0}</span>
+                            <input type="number" class="quantity-input" id="qty-input-${menu.id}" 
+                                   value="${saleQuantities[menu.id] || 0}" min="0" max="${currentStock}"
+                                   onchange="updateQuantityFromInput(${menu.id})" 
+                                   oninput="updateQuantityFromInput(${menu.id})">
                             <button class="quantity-btn" onclick="changeQuantity(${menu.id}, 1)">+</button>
                         </div>
                         <button class="btn btn-success btn-small" onclick="processSale(${menu.id})" 
@@ -647,7 +669,26 @@
             if (saleQuantities[menuId] < 0) saleQuantities[menuId] = 0;
             if (saleQuantities[menuId] > currentStock) saleQuantities[menuId] = currentStock;
             
-            document.getElementById(`qty-${menuId}`).textContent = saleQuantities[menuId];
+            // Update input field
+            const inputElement = document.getElementById(`qty-input-${menuId}`);
+            if (inputElement) {
+                inputElement.value = saleQuantities[menuId];
+            }
+        }
+
+        // Update kuantitas dari input field
+        function updateQuantityFromInput(menuId) {
+            const inputElement = document.getElementById(`qty-input-${menuId}`);
+            const menu = menuData.find(m => m.id === menuId);
+            const currentStock = menu.initialStock - menu.sold;
+            
+            let newQuantity = parseInt(inputElement.value) || 0;
+            
+            if (newQuantity < 0) newQuantity = 0;
+            if (newQuantity > currentStock) newQuantity = currentStock;
+            
+            saleQuantities[menuId] = newQuantity;
+            inputElement.value = newQuantity;
         }
 
         // Tambah stok
@@ -844,5 +885,5 @@
         // Inisialisasi aplikasi saat halaman dimuat
         init();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979ca32007c1fd8d',t:'MTc1Njk3OTk5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979d319fc592ce61',t:'MTc1Njk4NTgzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
